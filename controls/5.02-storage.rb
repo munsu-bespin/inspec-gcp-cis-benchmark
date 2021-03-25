@@ -54,6 +54,7 @@ in the bucket is publicly accessible either."
 
   bucket_names = google_storage_buckets(project: gcp_project_id).bucket_names
   if bucket_names.empty?
+    impact 'none'
     describe "[#{gcp_project_id}] does not have any buckets. This test is Not Applicable." do
       skip "[#{gcp_project_id}] does not have any buckets."
     end

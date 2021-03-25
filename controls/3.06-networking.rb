@@ -39,6 +39,7 @@ control "cis-gcp-#{control_id}-#{control_abbrev}" do
 
   fw_names = google_compute_firewalls(project: gcp_project_id).firewall_names
   if fw_names.empty?
+    impact 'none'
     describe "[#{gcp_project_id}] does not have any firewall rules. This test is Not Applicable." do
       skip "[#{gcp_project_id}] does not have any firewall rules."
     end
