@@ -38,16 +38,19 @@ control "cis-gcp-#{control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/storage/docs/access-control/iam-reference'
   ref 'GCP Docs', url: 'https://cloud.google.com/storage/docs/access-control/making-data-public'
 
-  describe google_storage_buckets(project: gcp_project_id) do
-    its('count') { should be >= 1}
-    skip "[#{gcp_project_id}] does not have Storage bucket."
-  end
-  google_storage_buckets(project: gcp_project_id).bucket_names.each do |bucket|
-    google_storage_bucket_iam_bindings(bucket: bucket).iam_binding_roles.each do |role|
-      describe "[#{gcp_project_id}] GCS Bucket #{bucket}, Role: #{role}" do
-        subject { google_storage_bucket_iam_binding(bucket: bucket, role: role) }
-        its('members') { should_not include 'allUsers' }
-        its('members') { should_not include 'allAuthenticatedUsers' }
+  bucket_names = google_storage_buckets(project: gcp_project_id).bucket_names
+  if bucket_names.empty?
+    describe "[#{gcp_project_id}] does not have any buckets. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have any buckets."
+    end
+  else
+    google_storage_buckets(project: gcp_project_id).bucket_names.each do |bucket|
+      google_storage_bucket_iam_bindings(bucket: bucket).iam_binding_roles.each do |role|
+        describe "[#{gcp_project_id}] GCS Bucket #{bucket}, Role: #{role}" do
+          subject { google_storage_bucket_iam_binding(bucket: bucket, role: role) }
+          its('members') { should_not include 'allUsers' }
+          its('members') { should_not include 'allAuthenticatedUsers' }
+        end
       end
     end
   end
