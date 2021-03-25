@@ -39,6 +39,7 @@ control "cis-gcp-#{control_id}-#{control_abbrev}" do
 
   describe google_compute_firewalls(project: gcp_project_id) do
     its('count') { should be >= 1 }
+    skip "[#{gcp_project_id}] does not have Firewall rules."
   end
   google_compute_firewalls(project: gcp_project_id).where(firewall_direction: 'INGRESS').firewall_names.each do |firewall_name|
     describe "[#{gcp_project_id}] #{firewall_name}" do
