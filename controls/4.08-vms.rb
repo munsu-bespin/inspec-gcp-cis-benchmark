@@ -60,19 +60,26 @@ control "cis-gcp-#{control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/shielded-vm'
   ref 'GCP Docs', url: 'https://cloud.google.com/security/shielded-cloud/shielded-vm#organization-policy-constraint'
 
-  gce_instances.each do |instance|
-    instance_object = google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name])
-    describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
-      if instance_object.shielded_instance_config.nil?
-        it 'should have a shielded instance config' do
-          expect(false).to be true
-        end
-      else
-        it 'should have integrity monitoring enabled' do
-          expect(instance_object.shielded_instance_config.enable_integrity_monitoring).to be true
-        end
-        it 'should have virtual trusted platform module (vTPM) enabled' do
-          expect(instance_object.shielded_instance_config.enable_vtpm).to be true
+  if gce_instances.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have Compute instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have Compute instances."
+    end
+  else
+    gce_instances.each do |instance|
+      instance_object = google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name])
+      describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
+        if instance_object.shielded_instance_config.nil?
+          it 'should have a shielded instance config' do
+            expect(false).to be true
+          end
+        else
+          it 'should have integrity monitoring enabled' do
+            expect(instance_object.shielded_instance_config.enable_integrity_monitoring).to be true
+          end
+          it 'should have virtual trusted platform module (vTPM) enabled' do
+            expect(instance_object.shielded_instance_config.enable_vtpm).to be true
+          end
         end
       end
     end

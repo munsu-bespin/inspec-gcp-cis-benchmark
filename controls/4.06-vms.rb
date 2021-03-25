@@ -40,17 +40,24 @@ control "cis-gcp-#{control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/compute/docs/networking#canipforward'
 
-  gce_instances.each do |instance|
-    next if instance[:name] =~ /^gke-/
-    gce = google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name])
-    describe.one do
-      describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
-        subject { gce }
-        its('can_ip_forward') { should be false }
-      end
-      describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]} ip-forwarding disabled" do
-        subject { gce }
-        it { should exist }
+  if gce_instances.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have Compute instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have Compute instances."
+    end
+  else
+    gce_instances.each do |instance|
+      next if instance[:name] =~ /^gke-/
+      gce = google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name])
+      describe.one do
+        describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
+          subject { gce }
+          its('can_ip_forward') { should be false }
+        end
+        describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]} ip-forwarding disabled" do
+          subject { gce }
+          it { should exist }
+        end
       end
     end
   end

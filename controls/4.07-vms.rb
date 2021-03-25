@@ -48,11 +48,18 @@ At least business critical VMs should have VM disks encrypted with CSEK."
   ref 'GCP Docs', url: 'https://cloud.google.com/compute/docs/reference/rest/v1/disks/get'
   ref 'GCP Docs', url: 'https://cloud.google.com/compute/docs/disks/customer-supplied-encryption#key_file'
 
-  gce_instances.each do |instance|
-    next if instance[:name] =~ /^gke-/
-    describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
-      subject { google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name]) }
-      it { should have_disks_encrypted_with_csek }
+  if gce_instances.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have Compute instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have Compute instances."
+    end
+  else
+    gce_instances.each do |instance|
+      next if instance[:name] =~ /^gke-/
+      describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
+        subject { google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name]) }
+        it { should have_disks_encrypted_with_csek }
+      end
     end
   end
 end

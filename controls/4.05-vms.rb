@@ -46,10 +46,17 @@ Therefore interactive serial console support should be disabled."
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/compute/docs/instances/interacting-with-serial-console'
 
-  gce_instances.each do |instance|
-    describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
-      subject { google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name]) }
-      it { should have_serial_port_disabled }
+  if gce_instances.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have Compute instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have Compute instances."
+    end
+  else
+    gce_instances.each do |instance|
+      describe "[#{gcp_project_id}] Instance #{instance[:zone]}/#{instance[:name]}" do
+        subject { google_compute_instance(project: gcp_project_id, zone: instance[:zone], name: instance[:name]) }
+        it { should have_serial_port_disabled }
+      end
     end
   end
 end
