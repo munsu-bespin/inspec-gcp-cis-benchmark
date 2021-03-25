@@ -42,31 +42,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/sqlserver/flags'
   ref 'GCP Docs', url: 'https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/cross-db-ownership-chaining-server-configuration-option?view=sql-server-ver15'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'SQLSERVER'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'cross db ownership chaining'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'cross db ownership chaining' set to 'off' " do
-              subject { flag }
-              its('name') { should cmp 'cross db ownership chaining' }
-              its('value') { should cmp 'off' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'SQLSERVER'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'cross db ownership chaining'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'cross db ownership chaining' set to 'off' " do
+                subject { flag }
+                its('name') { should cmp 'cross db ownership chaining' }
+                its('value') { should cmp 'off' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a SQL Server database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a SQL Server database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a SQL Server database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a SQL Server database"
+        end
       end
     end
   end
@@ -93,31 +100,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/contained-database-authentication-server-configuration-option?view=sql-server-ver15'
   ref 'GCP Docs', url: 'https://docs.microsoft.com/en-us/sql/relational-databases/databases/security-best-practices-with-contained-databases?view=sql-server-ver15'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'SQLSERVER'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'contained database authentication'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'contained database authentication' set to 'off' " do
-              subject { flag }
-              its('name') { should cmp 'contained database authentication' }
-              its('value') { should cmp 'off' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'SQLSERVER'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'contained database authentication'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'contained database authentication' set to 'off' " do
+                subject { flag }
+                its('name') { should cmp 'contained database authentication' }
+                its('value') { should cmp 'off' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a SQL Server database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a SQL Server database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a SQL Server database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a SQL Server database"
+        end
       end
     end
   end

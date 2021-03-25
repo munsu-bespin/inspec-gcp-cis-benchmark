@@ -41,31 +41,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/postgres/flags#setting_a_database_flag'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'log_checkpoints'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_checkpoints' set to 'on' " do
-              subject { flag }
-              its('name') { should cmp 'log_checkpoints' }
-              its('value') { should cmp 'on' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'log_checkpoints'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_checkpoints' set to 'on' " do
+                subject { flag }
+                its('name') { should cmp 'log_checkpoints' }
+                its('value') { should cmp 'on' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+        end
       end
     end
   end
@@ -92,31 +99,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/postgres/flags#setting_a_database_flag'
   ref 'GCP Docs', url: 'https://www.postgresql.org/docs/9.6/runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-WHAT'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'log_connections'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_connections' set to 'on' " do
-              subject { flag }
-              its('name') { should cmp 'log_connections' }
-              its('value') { should cmp 'on' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'log_connections'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_connections' set to 'on' " do
+                subject { flag }
+                its('name') { should cmp 'log_connections' }
+                its('value') { should cmp 'on' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+        end
       end
     end
   end
@@ -143,31 +157,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/postgres/flags#setting_a_database_flag'
   ref 'GCP Docs', url: 'https://www.postgresql.org/docs/9.6/runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-WHAT'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'log_disconnections'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_disconnections' set to 'on' " do
-              subject { flag }
-              its('name') { should cmp 'log_disconnections' }
-              its('value') { should cmp 'on' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'log_disconnections'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_disconnections' set to 'on' " do
+                subject { flag }
+                its('name') { should cmp 'log_disconnections' }
+                its('value') { should cmp 'on' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+        end
       end
     end
   end
@@ -195,31 +216,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/postgres/flags#setting_a_database_flag'
   ref 'GCP Docs', url: 'https://www.postgresql.org/docs/9.6/runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-WHAT'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'log_lock_waits'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_lock_waits' set to 'on' " do
-              subject { flag }
-              its('name') { should cmp 'log_lock_waits' }
-              its('value') { should cmp 'on' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'log_lock_waits'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_lock_waits' set to 'on' " do
+                subject { flag }
+                its('name') { should cmp 'log_lock_waits' }
+                its('value') { should cmp 'on' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+        end
       end
     end
   end
@@ -245,31 +273,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/postgres/flags#setting_a_database_flag'
   ref 'GCP Docs', url: 'https://www.postgresql.org/docs/9.6/runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-WHAT'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'log_min_error_statement'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_min_error_statement' set to 'ERROR' " do
-              subject { flag }
-              its('name') { should cmp 'log_min_error_statement' }
-              its('value') { should cmp 'ERROR' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'log_min_error_statement'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_min_error_statement' set to 'ERROR' " do
+                subject { flag }
+                its('name') { should cmp 'log_min_error_statement' }
+                its('value') { should cmp 'ERROR' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+        end
       end
     end
   end
@@ -294,31 +329,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/postgres/flags#setting_a_database_flag'
   ref 'GCP Docs', url: 'https://www.postgresql.org/docs/9.6/runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-WHAT'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'log_temp_files'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_temp_files' set to '0' " do
-              subject { flag }
-              its('name') { should cmp 'log_temp_files' }
-              its('value') { should cmp '0' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'log_temp_files'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_temp_files' set to '0' " do
+                subject { flag }
+                its('name') { should cmp 'log_temp_files' }
+                its('value') { should cmp '0' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+        end
       end
     end
   end
@@ -344,31 +386,38 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/postgres/flags#setting_a_database_flag'
   ref 'GCP Docs', url: 'https://www.postgresql.org/docs/9.6/runtime-config-logging.html#RUNTIME-CONFIG-LOGGING-WHAT'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        impact 'medium'
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'log_min_duration_statement'
-            describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_min_duration_statement' set to '-1' " do
-              subject { flag }
-              its('name') { should cmp 'log_min_duration_statement' }
-              its('value') { should cmp '-1' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'POSTGRES'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          impact 'medium'
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'log_min_duration_statement'
+              describe "[#{gcp_project_id} , #{db} ] should have a database flag 'log_min_duration_statement' set to '-1' " do
+                subject { flag }
+                its('name') { should cmp 'log_min_duration_statement' }
+                its('value') { should cmp '-1' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a PostgreSQL database"
+        end
       end
     end
   end

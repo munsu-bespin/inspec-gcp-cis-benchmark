@@ -71,29 +71,36 @@ control "cis-gcp-#{sub_control_id}-#{control_abbrev}" do
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/sql/docs/mysql/flags'
 
-  sql_cache.instance_names.each do |db|
-    if sql_cache.instance_objects[db].database_version.include? 'MYSQL'
-      if sql_cache.instance_objects[db].settings.database_flags.nil?
-        describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
-          subject { false }
-          it { should be true }
-        end
-      else
-        impact 'medium'
-        describe.one do
-          sql_cache.instance_objects[db].settings.database_flags.each do |flag|
-            next unless flag.name == 'local_infile'
-            describe flag do
-              its('name') { should cmp 'local_infile' }
-              its('value') { should cmp 'off' }
+  if sql_cache.instance_names.empty?
+    impact 'none'
+    describe "[#{gcp_project_id}] does not have CloudSQL instances. This test is Not Applicable." do
+      skip "[#{gcp_project_id}] does not have CloudSQL instances."
+    end
+  else
+    sql_cache.instance_names.each do |db|
+      if sql_cache.instance_objects[db].database_version.include? 'MYSQL'
+        if sql_cache.instance_objects[db].settings.database_flags.nil?
+          describe "[#{gcp_project_id} , #{db} ] does not any have database flags." do
+            subject { false }
+            it { should be true }
+          end
+        else
+          impact 'medium'
+          describe.one do
+            sql_cache.instance_objects[db].settings.database_flags.each do |flag|
+              next unless flag.name == 'local_infile'
+              describe flag do
+                its('name') { should cmp 'local_infile' }
+                its('value') { should cmp 'off' }
+              end
             end
           end
         end
-      end
-    else
-      impact 'none'
-      describe "[#{gcp_project_id}] [#{db}] is not a MySQL database. This test is Not Applicable." do
-        skip "[#{gcp_project_id}] [#{db}] is not a MySQL database"
+      else
+        impact 'none'
+        describe "[#{gcp_project_id}] [#{db}] is not a MySQL database. This test is Not Applicable." do
+          skip "[#{gcp_project_id}] [#{db}] is not a MySQL database"
+        end
       end
     end
   end

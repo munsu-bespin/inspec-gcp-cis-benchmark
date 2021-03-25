@@ -52,6 +52,11 @@ in the bucket is publicly accessible either."
   ref 'CIS Benchmark', url: cis_url.to_s
   ref 'GCP Docs', url: 'https://cloud.google.com/storage/docs/uniform-bucket-level-access'
 
+  describe google_storage_buckets(project: gcp_project_id) do
+    its('count') { should be >= 1}
+    skip "[#{gcp_project_id}] does not have Storage bucket."
+  end
+  
   google_storage_buckets(project: gcp_project_id).bucket_names.each do |bucket|
     uniform_bucket_level_access = google_storage_bucket(name: bucket).acl.nil?
     describe "[#{gcp_project_id}] GCS Bucket #{bucket}" do
